@@ -1,0 +1,3 @@
+- [x] Build the ClearDay ward shell, patient roster, filters, and inspection panel.
+- [x] Add unit switching and a demo vitals recording workflow.
+- [x] Verify keyboard access and the live preview.
