@@ -49,9 +49,10 @@ export function WardWorkspace({ view = 'dashboard' }: { view?: 'dashboard' | 'pa
   const isFever = (p: Patient) => (p.history.at(-1)?.temp ?? 0) >= 38;
   const urgency = (p: Patient) => isFever(p) ? 2 : !p.completed ? 1 : 0;
   const query = search.trim().toLowerCase().replace(/\s+/g, ' ');
+  const effectiveWing = sort === 'south' ? 'South' : sort === 'bed' ? 'North' : wing;
   const filtered = patients.filter(p => {
     const matchesTab = filter === 'all' || (filter === 'pending' && !p.completed) || (filter === 'completed' && p.completed) || (filter === 'fevers' && isFever(p));
-    const matchesWing = wing === 'all' || p.wing === wing;
+    const matchesWing = effectiveWing === 'all' || p.wing === effectiveWing;
     if (!query) return matchesTab && matchesWing;
     const haystack = `${p.name} ${p.bed} ${p.bed.replace('-', '')} ${p.wing} wing ${p.age} ${isFever(p) ? 'fever' : p.completed ? 'completed' : 'pending'}`.toLowerCase();
     return matchesTab && matchesWing && query.split(' ').every(term => haystack.includes(term));
