@@ -30,6 +30,7 @@ export function WardWorkspace({ view = 'dashboard' }: { view?: 'dashboard' | 'pa
   const [filter, setFilter] = useState(view === 'patients' ? 'all' : 'pending');
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('bed');
+  const [wing, setWing] = useState('all');
   const [selectedId, setSelectedId] = useState(1);
   const [drawer, setDrawer] = useState(true);
   const [page, setPage] = useState(1);
@@ -50,7 +51,8 @@ export function WardWorkspace({ view = 'dashboard' }: { view?: 'dashboard' | 'pa
   const query = search.trim().toLowerCase().replace(/\s+/g, ' ');
   const filtered = patients.filter(p => {
     const matchesTab = filter === 'all' || (filter === 'pending' && !p.completed) || (filter === 'completed' && p.completed) || (filter === 'fevers' && isFever(p));
-    if (!query) return matchesTab;
+    const matchesWing = wing === 'all' || p.wing === wing;
+    if (!query) return matchesTab && matchesWing;
     const haystack = `${p.name} ${p.bed} ${p.bed.replace('-', '')} ${p.wing} wing ${p.age} ${isFever(p) ? 'fever' : p.completed ? 'completed' : 'pending'}`.toLowerCase();
     return matchesTab && query.split(' ').every(term => haystack.includes(term));
   }).sort((a, b) => {
