@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { clearStreak, displayTemp, type Patient } from '@/lib/ward-data';
+import { clearStreak, displayTemp, dischargeLog, mortalityRate, type Patient } from '@/lib/ward-data';
 
 type Props = { role: 'nurse' | 'doctor' | 'admin'; patients: Patient[]; unit: 'C' | 'F'; reviewed: number[]; onReview: (id: number) => void };
 
