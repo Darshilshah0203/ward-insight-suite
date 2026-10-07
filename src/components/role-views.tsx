@@ -13,11 +13,15 @@ export function RoleView({ role, patients, unit, reviewed, onReview }: Props) {
     </div>;
   }
   const done = patients.filter(p => p.completed).length;
-  const stats = [['Occupied beds', `${patients.length} / 80`], ['Round completed', `${done} / ${patients.length}`], ['Active fevers', String(fever.length)], ['Discharges signed off', String(reviewed.length)]];
+  const mortality = mortalityRate(dischargeLog);
+  const stats = [['Occupied beds', `${patients.length} / 80`], ['Round completed', `${done} / ${patients.length}`], ['Active fevers', String(fever.length)], ['Discharges signed off', String(reviewed.length)], ['Discharged (30 days)', String(dischargeLog.length)], ['Mortality rate', `${mortality.rate}% (${mortality.deaths} of ${mortality.total})`]];
   const wings = (['North', 'South'] as const).map(w => { const list = patients.filter(p => p.wing === w); return { w, total: list.length, done: list.filter(p => p.completed).length, fever: list.filter(p => (p.history.at(-1)?.temp ?? 0) >= 38).length }; });
   return <div className="border-t pt-6">
-    <div className="mb-6 grid gap-4 sm:grid-cols-4">{stats.map(([l, v]) => <div key={l} className="rounded-lg border bg-card p-4"><div className="text-xs text-muted-foreground">{l}</div><div className="mt-1 text-2xl font-semibold text-primary">{v}</div></div>)}</div>
+    <div className="mb-6 grid gap-4 sm:grid-cols-3 lg:grid-cols-6">{stats.map(([l, v]) => <div key={l} className="rounded-lg border bg-card p-4"><div className="text-xs text-muted-foreground">{l}</div><div className="mt-1 text-2xl font-semibold text-primary">{v}</div></div>)}</div>
     <h2 className="mb-3 text-base font-semibold">Wing summary</h2>
     <table><thead><tr><th>Wing</th><th>Beds</th><th>Round completed</th><th>Fevers</th><th>Nurse on shift</th></tr></thead><tbody>{wings.map(x => <tr key={x.w}><td>{x.w} Wing</td><td>{x.total}</td><td>{x.done} / {x.total}</td><td>{x.fever}</td><td>{x.w === 'North' ? 'Sarah Lawson' : 'Daniel Okafor'}</td></tr>)}</tbody></table>
+    <h2 className="mb-3 mt-8 text-base font-semibold">Discharge records (last 30 days)</h2>
+    <div className="table-scroll"><table aria-label="Discharged patient records"><thead><tr><th>Patient</th><th>Bed</th><th>Admitted</th><th>Discharged</th><th>Stay</th><th>Outcome</th></tr></thead><tbody>{dischargeLog.map(r => <tr key={r.id}><td><div className="patient-name">{r.name}</div><div className="patient-meta">{r.age} years</div></td><td>{r.bed} · {r.wing}</td><td>{r.admitted}</td><td>{r.discharged}</td><td>{r.stay} days</td><td><span className={`badge ${r.outcome === 'Recovered' ? 'normal' : 'fever'}`}>{r.outcome}{r.cause ? ` — ${r.cause}` : ''}</span></td></tr>)}</tbody></table></div>
+    <p className="demo-label mt-4">Demo records for record-keeping preview. Not saved after a refresh.</p>
   </div>;
 }
